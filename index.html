@@ -69,6 +69,7 @@
                         <li><a href="#generator" class="nav-link">Explore</a></li>
                         <li><a href="#categories" class="nav-link">Categories</a></li>
                         <li><a href="#intelligence" class="nav-link">Intelligence</a></li>
+                        <li><a href="#composer" class="nav-link">AI Muse</a></li>
                         <li><a href="#favorites" class="nav-link">Favorites</a></li>
                         <li><a href="#daily" class="nav-link">Daily</a></li>
                         <li><a href="#about" class="nav-link">About</a></li>
@@ -184,15 +185,48 @@
                             </p>
                         </div>
 
+                        <!-- Gemini Deep Exegesis Breakdown Drawer -->
+                        <div id="geminiExegesisDrawer" class="gemini-exegesis-box" aria-live="polite">
+                            <div class="gemini-exegesis-header">
+                                <div class="gemini-badge-glow">
+                                    <span>✨</span>
+                                    <span>Gemini 3 Flash Perspective Exegesis</span>
+                                </div>
+                                <button type="button" id="btnCloseExegesis" class="btn-action-icon"
+                                    style="width: 32px; height: 32px" title="Close Exegesis">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <line x1="18" y1="6" x2="6" y2="18" />
+                                        <line x1="6" y1="6" x2="18" y2="18" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="geminiExegesisContent" class="exegesis-grid">
+                                <!-- Populated dynamically by Gemini LLM API -->
+                            </div>
+                        </div>
+
                         <div class="quote-actions-footer">
-                            <button type="button" id="btnMainGenerate" class="btn-generate-quote"
-                                aria-label="Generate new random quote">
-                                <span>Generate Quote</span>
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2.5">
-                                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
-                                </svg>
-                            </button>
+                            <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    flex-wrap: wrap;
+                  ">
+                                <button type="button" id="btnMainGenerate" class="btn-generate-quote"
+                                    aria-label="Generate new random quote">
+                                    <span>Generate Quote</span>
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.5">
+                                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                                    </svg>
+                                </button>
+
+                                <button type="button" id="btnGeminiUnpack" class="btn-gemini-spark"
+                                    aria-label="Unpack quote with Gemini AI">
+                                    <span>✨ Unpack with Gemini</span>
+                                </button>
+                            </div>
 
                             <div class="action-tool-buttons">
                                 <button type="button" id="btnToggleFav" class="btn-action-icon"
@@ -380,6 +414,13 @@
                         <h2 class="section-title">Quote Intelligence Analyzer</h2>
                     </div>
 
+                    <div style="text-align: center; margin-bottom: 2rem">
+                        <button type="button" id="btnRunGeminiAudit" class="btn-gemini-spark"
+                            style="padding: 0.85rem 1.8rem">
+                            <span>✨ Run Live Gemini 3 Flash Psychological Audit</span>
+                        </button>
+                    </div>
+
                     <div class="ai-intel-dashboard">
                         <div class="intel-metric-box">
                             <div class="intel-metric-label">Dominant Sentiment Tone</div>
@@ -410,6 +451,31 @@
                             </p>
                         </div>
                     </div>
+
+                    <div id="geminiPsychologyBox" style="
+                display: none;
+                margin-top: 1.5rem;
+                background: var(--color-surface-raised);
+                border: 1px solid var(--color-border-glow);
+                border-radius: var(--radius-md);
+                padding: 1.5rem;
+              ">
+                        <div style="
+                  font-size: 0.78rem;
+                  font-weight: 800;
+                  text-transform: uppercase;
+                  color: var(--color-accent-primary);
+                  letter-spacing: 0.06em;
+                  margin-bottom: 0.4rem;
+                ">
+                            Cognitive &amp; Neurological Framing (Gemini 3 Flash)
+                        </div>
+                        <p id="geminiPsychologyText" style="
+                  font-size: 0.95rem;
+                  color: var(--color-text-primary);
+                  line-height: 1.6;
+                "></p>
+                    </div>
                 </div>
             </section>
 
@@ -417,56 +483,197 @@
             <section id="composer" class="content-section">
                 <div class="site-container">
                     <div class="section-header-block">
-                        <span class="section-eyebrow">Template Synthesis Matrix</span>
-                        <h2 class="section-title">Smart Quote Composer</h2>
+                        <span class="section-eyebrow">Gemini 3 Flash Generative Muse</span>
+                        <h2 class="section-title">
+                            AI Perspective Muse &amp; Dilemma Solver
+                        </h2>
+                        <p style="
+                  color: var(--color-text-secondary);
+                  max-width: 620px;
+                  margin: 0.6rem auto 0;
+                  font-size: 0.95rem;
+                ">
+                            Describe your current situation, hurdle, or emotional state.
+                            Gemini 3 Flash will channel timeless philosophical archetypes to
+                            synthesize a personalized, bespoke perspective.
+                        </p>
                     </div>
 
-                    <div class="composer-deck">
+                    <div class="composer-deck" style="align-items: flex-start">
                         <div>
                             <div class="composer-control-group">
-                                <label for="compMoodSelect" class="composer-label">Select Resonance Mood</label>
-                                <select id="compMoodSelect" class="composer-select">
-                                    <option value="motivational">
-                                        Motivational &amp; Bold
-                                    </option>
-                                    <option value="calm">Calm &amp; Reflective</option>
-                                    <option value="creative">
-                                        Unconventional &amp; Creative
-                                    </option>
-                                    <option value="stoic">Stoic &amp; Pragmatic</option>
-                                </select>
+                                <label for="compDilemmaInput" class="composer-label">What situation or feeling are you
+                                    navigating right
+                                    now?</label>
+                                <textarea id="compDilemmaInput" class="composer-textarea"
+                                    placeholder="E.g., I'm feeling imposter syndrome starting my new job, or struggling to find creative focus..."></textarea>
+
+                                <div class="prompt-chips-row">
+                                    <button type="button" class="btn-prompt-chip"
+                                        data-prompt="Struggling with imposter syndrome and self-doubt in my career">
+                                        💼 Imposter Syndrome
+                                    </button>
+                                    <button type="button" class="btn-prompt-chip"
+                                        data-prompt="Need courage to take a major creative risk and put myself out there">
+                                        🎨 Creative Leap
+                                    </button>
+                                    <button type="button" class="btn-prompt-chip"
+                                        data-prompt="Recovering from a painful setback and feeling exhausted">
+                                        🌱 Setback &amp; Burnout
+                                    </button>
+                                    <button type="button" class="btn-prompt-chip"
+                                        data-prompt="Procrastinating on my most important lifelong ambition">
+                                        ⚡ Procrastination
+                                    </button>
+                                </div>
                             </div>
-                            <div class="composer-control-group">
-                                <label for="compTopicSelect" class="composer-label">Select Subject Domain</label>
-                                <select id="compTopicSelect" class="composer-select">
-                                    <option value="ambition">Ambition &amp; Mastery</option>
-                                    <option value="adversity">Adversity &amp; Grit</option>
-                                    <option value="curiosity">
-                                        Curiosity &amp; Innovation
-                                    </option>
-                                    <option value="innerPeace">
-                                        Inner Peace &amp; Clarity
-                                    </option>
-                                </select>
+
+                            <div style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 1rem;
+                  ">
+                                <div class="composer-control-group">
+                                    <label for="compPersonaSelect" class="composer-label">Philosophical Persona</label>
+                                    <select id="compPersonaSelect" class="composer-select">
+                                        <option value="Marcus Aurelius">
+                                            Marcus Aurelius (Stoic Emperor)
+                                        </option>
+                                        <option value="Rumi">
+                                            Rumi (Mystic &amp; Sufi Poet)
+                                        </option>
+                                        <option value="Maya Angelou">
+                                            Maya Angelou (Resilient &amp; Luminous)
+                                        </option>
+                                        <option value="Friedrich Nietzsche">
+                                            Friedrich Nietzsche (Bold Will-to-Power)
+                                        </option>
+                                        <option value="Alan Watts">
+                                            Alan Watts (Zen &amp; Playful Reality)
+                                        </option>
+                                        <option value="Leonardo da Vinci">
+                                            Leonardo da Vinci (Curious Polymath)
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="composer-control-group">
+                                    <label for="compToneSelect" class="composer-label">Delivery Tone</label>
+                                    <select id="compToneSelect" class="composer-select">
+                                        <option value="Tough Love & Pragmatic">
+                                            Tough Love &amp; Pragmatic
+                                        </option>
+                                        <option value="Poetic & Heart-Opening">
+                                            Poetic &amp; Heart-Opening
+                                        </option>
+                                        <option value="Calm Zen Stillness">
+                                            Calm Zen Stillness
+                                        </option>
+                                        <option value="Audacious & Electrifying">
+                                            Audacious &amp; Electrifying
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
-                            <button type="button" id="btnComposeQuote" class="btn-brand-primary"
-                                style="width: 100%; justify-content: center">
-                                <span>Synthesize Quote</span>
+
+                            <button type="button" id="btnComposeQuote" class="btn-brand-primary" style="
+                    width: 100%;
+                    justify-content: center;
+                    margin-top: 0.5rem;
+                  ">
+                                <span>Synthesize with Gemini AI</span>
                                 <span>✦</span>
                             </button>
                         </div>
 
-                        <div class="composer-output-panel">
-                            <div class="composed-quote-text" id="composedResultText">
+                        <div class="composer-output-panel" id="composerOutputPanel">
+                            <div class="gemini-badge-glow" style="margin-bottom: 1rem; font-size: 0.72rem">
+                                <span>✦</span>
+                                <span id="composerBadgeText">Gemini 3 Flash Synthesis</span>
+                            </div>
+
+                            <blockquote class="composed-quote-text" id="composedResultText">
                                 "The greatest barrier to ambition is not the peak ahead, but
                                 the friction of unnecessary doubt."
-                            </div>
-                            <div style="
-                    font-size: 0.9rem;
-                    font-weight: 700;
+                            </blockquote>
+                            <div id="composedAuthorText" style="
+                    font-size: 0.95rem;
+                    font-weight: 800;
                     color: var(--color-accent-primary);
+                    margin-bottom: 1.4rem;
                   ">
-                                — QuoteFlow Synthesis Engine
+                                — Marcus Aurelius (Synthesized via QuoteFlow)
+                            </div>
+
+                            <!-- Structured Meta Insights -->
+                            <div id="composerMetaDetails" style="
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 0.8rem;
+                    text-align: left;
+                    background: var(--color-surface);
+                    padding: 1.2rem;
+                    border-radius: var(--radius-sm);
+                    border: 1px solid var(--color-border);
+                    margin-bottom: 1.4rem;
+                  ">
+                                <div>
+                                    <span style="
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        color: var(--color-accent-primary);
+                      ">Core Principle:</span>
+                                    <span id="composerCorePrinciple" style="
+                        font-size: 0.86rem;
+                        color: var(--color-text-secondary);
+                        margin-left: 0.4rem;
+                      ">Mastery of judgment dissolves phantom impediments.</span>
+                                </div>
+                                <div>
+                                    <span style="
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        color: var(--color-accent-secondary);
+                      ">Daily Micro-Action:</span>
+                                    <span id="composerDailyAction" style="
+                        font-size: 0.86rem;
+                        color: var(--color-text-secondary);
+                        margin-left: 0.4rem;
+                      ">Take one 5-minute action directly into the task you
+                                        fear.</span>
+                                </div>
+                                <div>
+                                    <span style="
+                        font-size: 0.72rem;
+                        font-weight: 800;
+                        text-transform: uppercase;
+                        color: var(--color-text-muted);
+                      ">Reflection Inquiry:</span>
+                                    <span id="composerJournalPrompt" style="
+                        font-size: 0.86rem;
+                        color: var(--color-text-primary);
+                        font-style: italic;
+                        margin-left: 0.4rem;
+                      ">"What would I do if I could not fail?"</span>
+                                </div>
+                            </div>
+
+                            <div style="
+                    display: flex;
+                    justify-content: center;
+                    gap: 0.75rem;
+                    flex-wrap: wrap;
+                  ">
+                                <button type="button" id="btnApplyComposerToActive" class="btn-brand-secondary"
+                                    style="font-size: 0.84rem; padding: 0.5rem 1.1rem">
+                                    <span>Set as Active Quote</span>
+                                </button>
+                                <button type="button" id="btnCopyComposerQuote" class="btn-brand-secondary"
+                                    style="font-size: 0.84rem; padding: 0.5rem 1.1rem">
+                                    <span>Copy Text</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -684,6 +891,21 @@
                                 with an internal state memory cache. Whenever you request a
                                 new quote, the engine ensures the chosen index is never
                                 identical to the previous quote.
+                            </div>
+                        </div>
+                        <div class="faq-accordion-item">
+                            <button type="button" class="faq-trigger-btn" aria-expanded="false">
+                                <span>How does Gemini 3 Flash power quote exegesis and
+                                    synthesis?</span>
+                                <span>+</span>
+                            </button>
+                            <div class="faq-content-drawer">
+                                QuoteFlow integrates Google's
+                                <code>gemini-3-flash-preview</code> model to deliver real-time
+                                philosophical exegesis, psychological sentiment breakdowns,
+                                and customized perspective synthesis for real-world user
+                                dilemmas. Responses use structured JSON schemas for crisp,
+                                deterministic rendering with automatic exponential backoff.
                             </div>
                         </div>
                         <div class="faq-accordion-item">

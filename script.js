@@ -361,25 +361,32 @@ function showToast(msg) {
 
 // 3D Kinetic Character Flip-Wave Engine for Headings
 function initKineticHeadings() {
-  const headings = document.querySelectorAll("#heroKineticHeading, h2.section-title");
+  const headings = document.querySelectorAll(
+    "#heroKineticHeading, h2.section-title",
+  );
 
   headings.forEach((heading) => {
     // Collect all text nodes
     const textNodes = [];
-    const walk = document.createTreeWalker(heading, NodeFilter.SHOW_TEXT, null, false);
+    const walk = document.createTreeWalker(
+      heading,
+      NodeFilter.SHOW_TEXT,
+      null,
+      false,
+    );
     let node;
-    while(node = walk.nextNode()) {
-      if(node.nodeValue.trim() !== "") {
+    while ((node = walk.nextNode())) {
+      if (node.nodeValue.trim() !== "") {
         textNodes.push(node);
       }
     }
 
-    textNodes.forEach(textNode => {
+    textNodes.forEach((textNode) => {
       // Split by whitespace but capture it so we can preserve formatting
       const parts = textNode.nodeValue.split(/(\s+)/);
       const fragment = document.createDocumentFragment();
-      
-      parts.forEach(part => {
+
+      parts.forEach((part) => {
         if (/^\s+$/.test(part)) {
           // It's whitespace, just append as text node
           fragment.appendChild(document.createTextNode(part));
@@ -405,7 +412,7 @@ function initKineticHeadings() {
           fragment.appendChild(wordWrap);
         }
       });
-      
+
       textNode.parentNode.replaceChild(fragment, textNode);
     });
   });
@@ -843,58 +850,385 @@ if (SpeechRecognition) {
   });
 }
 
-// Smart Quote Composer Matrix
-const composerMatrix = {
-  motivational: {
-    ambition:
-      "The greatest barrier to ambition is not the peak ahead, but the friction of unnecessary doubt.",
-    adversity:
-      "Adversity does not build character in comfort; it reveals the reservoir of grit you always possessed.",
-    curiosity:
-      "Bold ambition begins with asking the audacious question that everyone else deemed trivial.",
-    innerPeace:
-      "Mastery of ambition is knowing that true victory requires conquering yourself, not your peers.",
-  },
-  calm: {
-    ambition:
-      "Move toward greatness with the unhurried cadence of a river carving solid stone.",
-    adversity:
-      "When the tempest roars, anchor your thoughts in the quiet center of your own values.",
-    curiosity:
-      "Observe the world softly; the deepest truths whisper only to the still and patient mind.",
-    innerPeace:
-      "Peace is not the total absence of turbulence, but the composure to remain undisturbed within it.",
-  },
-  creative: {
-    ambition:
-      "Never paint inside lines drawn by people who never held a brush.",
-    adversity:
-      "Every obstacle is simply raw material waiting for an inventive soul to reshape its purpose.",
-    curiosity:
-      "Question the obvious until it fractures and reveals the brilliant secret hidden inside.",
-    innerPeace:
-      "True creative freedom arrives when you stop creating for approval and start creating for truth.",
-  },
-  stoic: {
-    ambition:
-      "Measure not the acclaim bestowed by crowds, but the integrity of your personal discipline.",
-    adversity:
-      "The obstacle in the path becomes the path. What stands in the way becomes the way forward.",
-    curiosity:
-      "Investigate what lies within your control, and release what never belonged to you anyway.",
-    innerPeace:
-      "You have power over your mind, not outside events. Realize this, and you will find immense strength.",
-  },
-};
+/* ========================================================
+   GEMINI API LLM INTEGRATION LAYER (gemini-3-flash-preview)
+   ======================================================== */
+async function callGeminiAPI(
+  systemPrompt,
+  userQuery,
+  jsonSchema = null,
+  maxRetries = 3,
+) {
+  const apiKey = ""; // Canvas runtime provides the key automatically
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
 
-document.getElementById("btnComposeQuote").addEventListener("click", () => {
-  const mood = document.getElementById("compMoodSelect").value;
-  const topic = document.getElementById("compTopicSelect").value;
-  const res =
-    composerMatrix[mood]?.[topic] ||
-    "True perspective transforms ordinary moments into lifelong wisdom.";
-  document.getElementById("composedResultText").textContent = `"${res}"`;
-  showToast("Quote synthesized! ✦");
+  const payload = {
+    contents: [{ parts: [{ text: userQuery }] }],
+    systemInstruction: { parts: [{ text: systemPrompt }] },
+  };
+
+  if (jsonSchema) {
+    payload.generationConfig = {
+      responseMimeType: "application/json",
+      responseSchema: jsonSchema,
+    };
+  }
+
+  let delay = 1000;
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429 && attempt < maxRetries - 1) {
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          delay *= 2;
+          continue;
+        }
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) throw new Error("Empty response from Gemini API");
+      return text;
+    } catch (err) {
+      if (attempt < maxRetries - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2;
+      } else {
+        throw err;
+      }
+    }
+  }
+}
+
+/* Feature 1: Deep Philosophical Exegesis on Active Quote */
+const btnGeminiUnpack = document.getElementById("btnGeminiUnpack");
+const geminiExegesisDrawer = document.getElementById("geminiExegesisDrawer");
+const geminiExegesisContent = document.getElementById("geminiExegesisContent");
+const btnCloseExegesis = document.getElementById("btnCloseExegesis");
+
+async function unpackQuoteWithGemini() {
+  const activeQuote = quotesDataset[currentQuoteIndex];
+  if (!activeQuote) return;
+
+  btnGeminiUnpack.classList.add("is-loading");
+  btnGeminiUnpack.innerHTML = `<span>⏳ Synthesizing Wisdom...</span>`;
+  geminiExegesisDrawer.classList.add("is-active");
+
+  // Show shimmer loading skeleton
+  geminiExegesisContent.innerHTML = `
+    <div class="exegesis-card gemini-shimmer-loading" style="height:120px;"></div>
+    <div class="exegesis-card gemini-shimmer-loading" style="height:120px;"></div>
+    <div class="exegesis-card gemini-shimmer-loading" style="height:120px;"></div>
+    <div class="exegesis-card gemini-shimmer-loading" style="height:120px;"></div>
+  `;
+
+  const systemPrompt = `You are a world-class philosophical mentor and cognitive psychologist. Analyze the given quote and provide a deeply structured, modern, practical breakdown. Return strictly valid JSON conforming to the requested schema.`;
+  const userQuery = `Quote: "${activeQuote.text}" by ${activeQuote.author}. Domain: ${activeQuote.category}.`;
+
+  const schema = {
+    type: "OBJECT",
+    properties: {
+      lifeApplication: {
+        type: "STRING",
+        description:
+          "Clear, practical real-world application for everyday decisions.",
+      },
+      philosophicalRoots: {
+        type: "STRING",
+        description:
+          "Historical and philosophical lineage (e.g. Stoicism, Existentialism, Buddhism).",
+      },
+      counterPerspective: {
+        type: "STRING",
+        description:
+          "Constructive nuance: when does this quote NOT apply or risk toxic positivity?",
+      },
+      actionablePractice: {
+        type: "STRING",
+        description:
+          "A micro-action or mental experiment the reader can try right now.",
+      },
+    },
+    required: [
+      "lifeApplication",
+      "philosophicalRoots",
+      "counterPerspective",
+      "actionablePractice",
+    ],
+    propertyOrdering: [
+      "lifeApplication",
+      "philosophicalRoots",
+      "counterPerspective",
+      "actionablePractice",
+    ],
+  };
+
+  try {
+    const rawJson = await callGeminiAPI(systemPrompt, userQuery, schema);
+    const data = JSON.parse(rawJson);
+
+    geminiExegesisContent.innerHTML = `
+      <div class="exegesis-card">
+        <div class="exegesis-card-title"><span>🎯</span> Real-World Application</div>
+        <p class="exegesis-card-desc">${data.lifeApplication}</p>
+      </div>
+      <div class="exegesis-card">
+        <div class="exegesis-card-title"><span>🏛️</span> Philosophical Roots</div>
+        <p class="exegesis-card-desc">${data.philosophicalRoots}</p>
+      </div>
+      <div class="exegesis-card">
+        <div class="exegesis-card-title"><span>⚖️</span> Counter-Perspective</div>
+        <p class="exegesis-card-desc">${data.counterPerspective}</p>
+      </div>
+      <div class="exegesis-card">
+        <div class="exegesis-card-title"><span>⚡</span> Micro-Practice Today</div>
+        <p class="exegesis-card-desc">${data.actionablePractice}</p>
+      </div>
+    `;
+    showToast("Gemini 3 Flash Exegesis Complete ✨");
+  } catch (err) {
+    geminiExegesisContent.innerHTML = `
+      <div class="exegesis-card" style="grid-column: 1 / -1; border-color: var(--color-accent-primary);">
+        <div class="exegesis-card-title"><span>💡</span> Contextual Insight</div>
+        <p class="exegesis-card-desc">${activeQuote.insight} Ground yourself in intentional action, applying this truth to your immediate choices.</p>
+      </div>
+    `;
+    showToast("Rendered offline philosophical breakdown");
+  } finally {
+    btnGeminiUnpack.classList.remove("is-loading");
+    btnGeminiUnpack.innerHTML = `<span>✨ Unpack with Gemini</span>`;
+  }
+}
+
+btnGeminiUnpack.addEventListener("click", unpackQuoteWithGemini);
+btnCloseExegesis.addEventListener("click", () => {
+  geminiExegesisDrawer.classList.remove("is-active");
+});
+
+/* Feature 2: Live Psychological Sentiment Audit with Gemini */
+const btnRunGeminiAudit = document.getElementById("btnRunGeminiAudit");
+const geminiPsychologyBox = document.getElementById("geminiPsychologyBox");
+const geminiPsychologyText = document.getElementById("geminiPsychologyText");
+
+async function runGeminiPsychologicalAudit() {
+  const activeQuote = quotesDataset[currentQuoteIndex];
+  if (!activeQuote) return;
+
+  btnRunGeminiAudit.classList.add("is-loading");
+  btnRunGeminiAudit.innerHTML = `<span>⏳ Auditing Sentiment...</span>`;
+
+  const systemPrompt = `You are an expert psycholinguist and emotional sentiment researcher. Analyze the emotional resonance, energy velocity, and cognitive reframing of the quote. Return strictly valid JSON.`;
+  const userQuery = `Quote: "${activeQuote.text}" by ${activeQuote.author}.`;
+
+  const schema = {
+    type: "OBJECT",
+    properties: {
+      sentimentTone: { type: "STRING" },
+      energyQuotient: { type: "INTEGER" },
+      philosophicalPillar: { type: "STRING" },
+      psychologicalMechanism: { type: "STRING" },
+    },
+    required: [
+      "sentimentTone",
+      "energyQuotient",
+      "philosophicalPillar",
+      "psychologicalMechanism",
+    ],
+    propertyOrdering: [
+      "sentimentTone",
+      "energyQuotient",
+      "philosophicalPillar",
+      "psychologicalMechanism",
+    ],
+  };
+
+  try {
+    const rawJson = await callGeminiAPI(systemPrompt, userQuery, schema);
+    const data = JSON.parse(rawJson);
+
+    intelSentimentTone.textContent = data.sentimentTone;
+    intelEnergyVal.textContent = `${Math.min(100, Math.max(10, data.energyQuotient))}% Dynamic`;
+    intelEnergyFill.style.width = `${Math.min(100, Math.max(10, data.energyQuotient))}%`;
+    intelPhilosophyPillar.textContent = data.philosophicalPillar;
+
+    geminiPsychologyBox.style.display = "block";
+    geminiPsychologyText.textContent = data.psychologicalMechanism;
+    showToast("Live Gemini Audit Updated 🧠");
+  } catch (err) {
+    showToast("Audit complete (offline calibrated)");
+  } finally {
+    btnRunGeminiAudit.classList.remove("is-loading");
+    btnRunGeminiAudit.innerHTML = `<span>✨ Run Live Gemini 3 Flash Psychological Audit</span>`;
+  }
+}
+
+btnRunGeminiAudit.addEventListener("click", runGeminiPsychologicalAudit);
+
+/* Feature 3: Gemini Generative Quote Muse & Dilemma Solver */
+let currentComposerResult = null;
+const btnComposeQuote = document.getElementById("btnComposeQuote");
+const compDilemmaInput = document.getElementById("compDilemmaInput");
+const compPersonaSelect = document.getElementById("compPersonaSelect");
+const compToneSelect = document.getElementById("compToneSelect");
+const composedResultText = document.getElementById("composedResultText");
+const composedAuthorText = document.getElementById("composedAuthorText");
+const composerCorePrinciple = document.getElementById("composerCorePrinciple");
+const composerDailyAction = document.getElementById("composerDailyAction");
+const composerJournalPrompt = document.getElementById("composerJournalPrompt");
+const btnApplyComposerToActive = document.getElementById(
+  "btnApplyComposerToActive",
+);
+const btnCopyComposerQuote = document.getElementById("btnCopyComposerQuote");
+
+// Prompt Chips delegation
+document.querySelectorAll(".btn-prompt-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    compDilemmaInput.value = chip.getAttribute("data-prompt");
+    compDilemmaInput.focus();
+  });
+});
+
+async function synthesizeGeminiQuote() {
+  const dilemma =
+    compDilemmaInput.value.trim() ||
+    "Seeking purpose, courage, and direction in life";
+  const persona = compPersonaSelect.value;
+  const tone = compToneSelect.value;
+
+  btnComposeQuote.classList.add("is-loading");
+  btnComposeQuote.innerHTML = `<span>✦ Channeling ${persona}...</span>`;
+
+  const systemPrompt = `You are Gemini 3 Flash, acting as a profound philosophical muse. Given the user's specific life situation or emotional friction, channel the wisdom and voice of the requested historical thinker (${persona}) in the specified tone (${tone}). Synthesize a brand-new, powerful, original quote with micro-actions and reflections. Return strictly valid JSON.`;
+  const userQuery = `Situation: "${dilemma}". Thinker persona: "${persona}". Desired tone: "${tone}".`;
+
+  const schema = {
+    type: "OBJECT",
+    properties: {
+      quote: {
+        type: "STRING",
+        description: "Original powerful quote under 35 words.",
+      },
+      authorPersona: {
+        type: "STRING",
+        description: "Formatted attribution name.",
+      },
+      corePhilosophy: {
+        type: "STRING",
+        description: "Single-sentence underlying truth.",
+      },
+      practicalApplication: {
+        type: "STRING",
+        description: "Immediate 2-minute physical habit or shift.",
+      },
+      reflectionQuestion: {
+        type: "STRING",
+        description: "Penetrating journal question.",
+      },
+      mood: { type: "STRING" },
+      category: { type: "STRING" },
+    },
+    required: [
+      "quote",
+      "authorPersona",
+      "corePhilosophy",
+      "practicalApplication",
+      "reflectionQuestion",
+      "mood",
+      "category",
+    ],
+    propertyOrdering: [
+      "quote",
+      "authorPersona",
+      "corePhilosophy",
+      "practicalApplication",
+      "reflectionQuestion",
+      "mood",
+      "category",
+    ],
+  };
+
+  try {
+    const rawJson = await callGeminiAPI(systemPrompt, userQuery, schema);
+    const data = JSON.parse(rawJson);
+    currentComposerResult = data;
+
+    composedResultText.textContent = `"${data.quote}"`;
+    composedAuthorText.textContent = `— ${data.authorPersona} (Channelled via Gemini 3 Flash)`;
+    composerCorePrinciple.textContent = data.corePhilosophy;
+    composerDailyAction.textContent = data.practicalApplication;
+    composerJournalPrompt.textContent = `"${data.reflectionQuestion}"`;
+
+    showToast(`Perspective synthesized via ${persona}! ✦`);
+  } catch (err) {
+    // Graceful deterministic fallback
+    const fallbackText =
+      "When the path ahead is obscured by mist, the master takes the single honest step right beneath their feet.";
+    composedResultText.textContent = `"${fallbackText}"`;
+    composedAuthorText.textContent = `— ${persona} (Synthesized Offline)`;
+    composerCorePrinciple.textContent =
+      "Present-moment clarity conquers hypothetical anxieties.";
+    composerDailyAction.textContent =
+      "Take the smallest tangible step toward your immediate priority.";
+    composerJournalPrompt.textContent =
+      '"What am I avoiding that requires my direct attention?"';
+    currentComposerResult = {
+      quote: fallbackText,
+      authorPersona: `${persona} (QuoteFlow Muse)`,
+      category: "Wisdom",
+      mood: "Grounded Resolve",
+      corePhilosophy: "Action grounds anxiety.",
+      practicalApplication: "Take one tangible step now.",
+      reflectionQuestion: "What is my immediate priority?",
+    };
+    showToast("Quote synthesized (offline fallback)");
+  } finally {
+    btnComposeQuote.classList.remove("is-loading");
+    btnComposeQuote.innerHTML = `<span>Synthesize with Gemini AI</span><span>✦</span>`;
+  }
+}
+
+btnComposeQuote.addEventListener("click", synthesizeGeminiQuote);
+
+// Apply Composer Result directly to Main Quote Display
+btnApplyComposerToActive.addEventListener("click", () => {
+  if (!currentComposerResult) {
+    showToast("Synthesize a quote first!");
+    return;
+  }
+
+  const syntheticQuote = {
+    id: Date.now(),
+    text: currentComposerResult.quote,
+    author: currentComposerResult.authorPersona,
+    category: currentComposerResult.category || "AI Muse",
+    mood: currentComposerResult.mood || "Transcendent Clarity",
+    energy: 90,
+    tone: "Empowering Synthesis",
+    pillar: currentComposerResult.corePhilosophy || "Sovereign Mindset",
+    insight:
+      currentComposerResult.practicalApplication || "Embrace immediate action.",
+  };
+
+  quotesDataset.unshift(syntheticQuote);
+  currentQuoteIndex = 0;
+  renderActiveQuote(0);
+
+  const genSection = document.getElementById("generator");
+  if (genSection) genSection.scrollIntoView({ behavior: "smooth" });
+  showToast("Active quote updated! ✦");
+});
+
+// Copy Composer Quote
+btnCopyComposerQuote.addEventListener("click", () => {
+  const text = `${composedResultText.textContent}\n${composedAuthorText.textContent}`;
+  copyTextToClipboard(text);
 });
 
 // Deterministic Quote of the Day

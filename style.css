@@ -588,6 +588,202 @@ body,
   transform: scale(0.97) translateY(8px);
 }
 
+/* Gemini AI Exegesis Drawer */
+.gemini-exegesis-box {
+  display: none;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-glow);
+  border-radius: var(--radius-md);
+  padding: 1.8rem;
+  margin-bottom: 2rem;
+  animation: fadeInExegesis 0.35s var(--ease-standard);
+  position: relative;
+  overflow: hidden;
+}
+.gemini-exegesis-box.is-active {
+  display: block;
+}
+
+@keyframes fadeInExegesis {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gemini-exegesis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.gemini-badge-glow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 90, 54, 0.15),
+    rgba(255, 67, 112, 0.15)
+  );
+  border: 1px solid var(--color-accent-primary);
+  color: var(--color-accent-primary);
+  padding: 0.35rem 0.95rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.exegesis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+
+.exegesis-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 1.15rem;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+.exegesis-card:hover {
+  border-color: var(--color-accent-primary);
+  transform: translateY(-2px);
+}
+
+.exegesis-card-title {
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent-primary);
+  margin-bottom: 0.45rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.exegesis-card-desc {
+  font-size: 0.88rem;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+}
+
+/* Gemini Skeleton Shimmer Loader */
+.gemini-shimmer-loading {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-raised) 25%,
+    var(--color-surface) 50%,
+    var(--color-surface-raised) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmerScan 1.6s infinite ease-in-out;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmerScan {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Interactive Gemini Action Buttons */
+.btn-gemini-spark {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 90, 54, 0.12),
+    rgba(255, 67, 112, 0.12)
+  );
+  color: var(--color-accent-primary);
+  border: 1px solid var(--color-border-glow);
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  transition: all 0.25s ease;
+}
+.btn-gemini-spark:hover {
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-primary),
+    var(--color-accent-secondary)
+  );
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--color-accent-glow);
+}
+.btn-gemini-spark.is-loading {
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+/* Dilemma Textarea & Chip Elements */
+.composer-textarea {
+  width: 100%;
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1rem;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.92rem;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  transition: border-color 0.2s ease;
+  line-height: 1.55;
+}
+.composer-textarea:focus {
+  border-color: var(--color-accent-primary);
+}
+
+.prompt-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.btn-prompt-chip {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-prompt-chip:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
+  background: var(--color-surface);
+}
+
+/* Quote Statement & Actions */
 .quote-statement {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3.8vw, 2.85rem);
