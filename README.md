@@ -12,9 +12,9 @@ Designed to feel more like a polished **digital inspiration platform** than a ba
 
 ## 🌟 Live Experience
 
-🔗 **Live Demo:** `https://your-live-demo-url.com`
+🔗 **Live Demo:** `https://gemini-quoteflow.netlify.app/`
 
-📦 **Repository:** `https://github.com/your-username/quoteflow`
+📦 **Repository:** `https://github.com/JatinJoshi-JJ/Quote-Flow.git`
 
 ---
 
